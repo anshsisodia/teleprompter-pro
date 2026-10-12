@@ -116,7 +116,7 @@
                     </label>
                 </div>
 
-                <!-- NEW: Mobile Remote Section -->
+                <!-- Mobile Remote Section -->
                 <div class="space-y-3 bg-gray-800/40 p-4 rounded-lg border border-gray-700">
                     <label class="block text-sm font-bold text-gray-400 uppercase tracking-wider flex justify-between items-center">
                         Phone Remote
@@ -143,7 +143,7 @@
                         </button>
                     </div>
                     <div class="text-xs text-gray-500 text-center">
-                        <b>Spacebar</b>: Play/Pause &nbsp;&bull;&nbsp; <b>Up/Down</b>: Speed
+                        <b>Space</b>: Play/Pause &bull; <b>Up/Down</b>: Speed &bull; <b>Touchpad/W/S</b>: Scroll
                     </div>
                 </div>
             </div>
@@ -165,7 +165,7 @@
 
         <!-- Text Wrapper (Where mirroring is applied) -->
         <div id="text-wrapper" class="relative z-10 w-full h-full transform transition-transform duration-300">
-            <!-- Text Content (Where margins and scrolling are applied, kept above highlighter z-10) -->
+            <!-- Text Content -->
             <div id="text-content" class="w-full text-white font-bold leading-relaxed whitespace-pre-wrap pt-[50vh] pb-[100vh] drop-shadow-lg" style="font-size: 80px; padding-left: 15%; padding-right: 15%;">
             </div>
         </div>
@@ -176,7 +176,7 @@
         <i class="fa-solid fa-gear text-xl"></i>
     </button>
 
-    <!-- NEW: Mobile Remote Interface (Hidden by default, shown only on phone) -->
+    <!-- Mobile Remote Interface -->
     <div id="mobile-remote-view" class="fixed inset-0 bg-gray-900 z-[100] hidden flex-col items-center justify-start pt-12 px-6 space-y-6 overflow-y-auto w-full h-full">
         <h1 class="text-2xl font-bold text-blue-400 mb-2 flex items-center"><i class="fa-solid fa-mobile-screen-button mr-2"></i> Prompter Remote</h1>
         <div id="remote-connection-status" class="text-yellow-400 mb-8 font-semibold bg-gray-800 px-4 py-2 rounded-full shadow">Connecting to host...</div>
@@ -188,7 +188,7 @@
         
         <button id="remote-play-btn" class="w-full max-w-md bg-blue-600 active:bg-blue-500 rounded-3xl py-12 text-white font-bold text-3xl shadow-[0_0_20px_rgba(37,99,235,0.4)] flex flex-col items-center transition"><i class="fa-solid fa-play mb-3 text-5xl"></i> Play / Pause</button>
         
-        <!-- NEW: Manual Scroll Buttons -->
+        <!-- Manual Scroll Buttons -->
         <div class="flex gap-4 w-full max-w-md mt-4">
             <button id="remote-scroll-up-btn" class="flex-1 bg-gray-700 active:bg-gray-600 rounded-2xl py-6 text-white font-bold text-xl shadow-lg flex flex-col items-center transition select-none"><i class="fa-solid fa-angles-up mb-2 text-3xl text-gray-400"></i> Scroll Up</button>
             <button id="remote-scroll-down-btn" class="flex-1 bg-gray-700 active:bg-gray-600 rounded-2xl py-6 text-white font-bold text-xl shadow-lg flex flex-col items-center transition select-none"><i class="fa-solid fa-angles-down mb-2 text-3xl text-gray-400"></i> Scroll Down</button>
@@ -200,7 +200,7 @@
     <script>
         // State Variables
         let state = {
-            script: "Welcome to Prompter Pro!\n\nWrite or paste your script here.\n\nUse the settings on the left to adjust:\n- Scroll Speed\n- Font Size\n- Margins\n\nYou can mirror the text horizontally or vertically to match your Neewer teleprompter glass setup.\n\nPRO TIP: You can use a Bluetooth clicker to control this app.\n- Spacebar: Play & Pause\n- Up/Down Arrows: Adjust speed on the fly.\n\nWhen you press Play, the settings panel will auto-hide to prevent light bleed. Move your mouse to the top left of the screen to reveal the settings gear icon.",
+            script: "Welcome to Prompter Pro!\n\nWrite or paste your script here.\n\nUse the settings on the left to adjust:\n- Scroll Speed\n- Font Size\n- Margins\n\nYou can mirror the text horizontally or vertically to match your Neewer teleprompter glass setup.\n\nPRO TIP: You can use a Bluetooth clicker to control this app.\n- Spacebar: Play & Pause\n- Up/Down Arrows: Adjust speed on the fly.\n- W/S Keys or Mouse Scroll: Manually scroll the text.\n\nWhen you press Play, the settings panel will auto-hide to prevent light bleed.",
             speed: 15,
             fontSize: 80,
             margin: 15,
@@ -236,7 +236,7 @@
             eyelineIndicator: document.getElementById('eyeline-indicator'),
         };
 
-        // Load state from local storage if it exists
+        // Load state from local storage
         function loadState() {
             const savedState = localStorage.getItem('prompterState');
             if (savedState) {
@@ -253,35 +253,27 @@
             localStorage.setItem('prompterState', JSON.stringify(state));
         }
 
-        // Update settings panel UI to match state
+        // Update UI
         function updateUIFromState() {
             DOM.scriptInput.value = state.script;
-            
             DOM.speedSlider.value = state.speed;
             DOM.speedInput.value = state.speed;
-            
             DOM.fontSizeSlider.value = state.fontSize;
             DOM.fontSizeInput.value = state.fontSize;
-            
             DOM.marginSlider.value = state.margin;
             DOM.marginInput.value = state.margin;
-            
             DOM.mirrorXToggle.checked = state.mirrorX;
             DOM.mirrorYToggle.checked = state.mirrorY;
             DOM.eyelineToggle.checked = state.showEyeline;
         }
 
-        // Apply state to the actual prompter display
+        // Apply state
         function applyStateToPrompter() {
-            // Update Text
-            DOM.textContent.innerText = state.script || " "; // Provide space if empty to maintain structure
-
-            // Update Styles
+            DOM.textContent.innerText = state.script || " ";
             DOM.textContent.style.fontSize = `${state.fontSize}px`;
             DOM.textContent.style.paddingLeft = `${state.margin}%`;
             DOM.textContent.style.paddingRight = `${state.margin}%`;
-
-            // Update Mirroring
+            
             DOM.textWrapper.className = 'relative z-10 w-full h-full transform transition-transform duration-300';
             if (state.mirrorX && state.mirrorY) {
                 DOM.textWrapper.classList.add('mirror-xy');
@@ -291,7 +283,6 @@
                 DOM.textWrapper.classList.add('mirror-y');
             }
 
-            // Update Eyeline
             DOM.eyelineIndicator.style.display = state.showEyeline ? 'flex' : 'none';
         }
 
@@ -302,13 +293,8 @@
             lastTimestamp = timestamp;
 
             if (isPlaying) {
-                // Calculate scroll amount based on speed and delta time for silky smooth movement
-                // Speed scale: 1 is very slow, 50 is very fast. 
-                // We use deltaTime to ensure consistent speed across different monitor refresh rates.
                 const speedMultiplier = state.speed * 0.01; 
                 currentScrollY += speedMultiplier * deltaTime;
-                
-                // Apply hardware-accelerated transform
                 DOM.textContent.style.transform = `translateY(-${currentScrollY}px)`;
             }
 
@@ -325,7 +311,7 @@
                 DOM.playBtn.classList.replace('hover:bg-blue-500', 'hover:bg-amber-500');
                 hideSettings();
                 document.body.classList.add('cursor-hidden');
-                lastTimestamp = performance.now(); // Reset timestamp on play
+                lastTimestamp = performance.now();
             } else {
                 DOM.playBtn.innerHTML = '<i class="fa-solid fa-play mr-2"></i> Play';
                 DOM.playBtn.classList.replace('bg-amber-600', 'bg-blue-600');
@@ -341,7 +327,6 @@
             if (isPlaying) togglePlay();
         }
 
-        // Settings Panel Management
         function hideSettings() {
             DOM.settingsPanel.classList.add('settings-hidden');
             setTimeout(() => { DOM.showSettingsBtn.classList.remove('hidden'); }, 300);
@@ -350,23 +335,17 @@
         function showSettings() {
             DOM.settingsPanel.classList.remove('settings-hidden');
             DOM.showSettingsBtn.classList.add('hidden');
-            if (isPlaying) togglePlay(); // Auto-pause when opening settings
+            if (isPlaying) togglePlay(); 
         }
 
-        // Fullscreen Management
         function toggleFullscreen() {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
-                });
+                document.documentElement.requestFullscreen().catch(err => {});
             } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
+                if (document.exitFullscreen) document.exitFullscreen();
             }
         }
 
-        // Update Fullscreen Button UI
         document.addEventListener('fullscreenchange', () => {
             if (document.fullscreenElement) {
                 DOM.fullscreenBtn.innerHTML = '<i class="fa-solid fa-compress mr-2"></i> Exit Fullscreen';
@@ -375,101 +354,65 @@
             }
         });
 
-        // Event Listeners for UI Controls
-        DOM.scriptInput.addEventListener('input', (e) => {
-            state.script = e.target.value;
-            applyStateToPrompter();
-            saveState();
-        });
+        // UI Listeners
+        DOM.scriptInput.addEventListener('input', (e) => { state.script = e.target.value; applyStateToPrompter(); saveState(); });
+        DOM.speedSlider.addEventListener('input', (e) => { state.speed = parseInt(e.target.value); DOM.speedInput.value = state.speed; saveState(); });
+        DOM.speedInput.addEventListener('input', (e) => { let val = parseInt(e.target.value); if(isNaN(val)) return; if(val>50)val=50; if(val<1)val=1; state.speed = val; DOM.speedSlider.value = state.speed; saveState(); });
+        DOM.fontSizeSlider.addEventListener('input', (e) => { state.fontSize = parseInt(e.target.value); DOM.fontSizeInput.value = state.fontSize; applyStateToPrompter(); saveState(); });
+        DOM.fontSizeInput.addEventListener('input', (e) => { let val = parseInt(e.target.value); if(isNaN(val)) return; if(val>300)val=300; if(val<10)val=10; state.fontSize = val; DOM.fontSizeSlider.value = state.fontSize; applyStateToPrompter(); saveState(); });
+        DOM.marginSlider.addEventListener('input', (e) => { state.margin = parseInt(e.target.value); DOM.marginInput.value = state.margin; applyStateToPrompter(); saveState(); });
+        DOM.marginInput.addEventListener('input', (e) => { let val = parseInt(e.target.value); if(isNaN(val)) return; if(val>45)val=45; if(val<0)val=0; state.margin = val; DOM.marginSlider.value = state.margin; applyStateToPrompter(); saveState(); });
+        DOM.mirrorXToggle.addEventListener('change', (e) => { state.mirrorX = e.target.checked; applyStateToPrompter(); saveState(); });
+        DOM.mirrorYToggle.addEventListener('change', (e) => { state.mirrorY = e.target.checked; applyStateToPrompter(); saveState(); });
+        DOM.eyelineToggle.addEventListener('change', (e) => { state.showEyeline = e.target.checked; applyStateToPrompter(); saveState(); });
 
-        // Speed Listeners
-        DOM.speedSlider.addEventListener('input', (e) => {
-            state.speed = parseInt(e.target.value);
-            DOM.speedInput.value = state.speed;
-            saveState();
-        });
-        DOM.speedInput.addEventListener('input', (e) => {
-            let val = parseInt(e.target.value);
-            if(isNaN(val)) return;
-            if(val > 50) val = 50; if(val < 1) val = 1; // Limit bounds
-            state.speed = val;
-            DOM.speedSlider.value = state.speed;
-            saveState();
-        });
-
-        // Font Size Listeners
-        DOM.fontSizeSlider.addEventListener('input', (e) => {
-            state.fontSize = parseInt(e.target.value);
-            DOM.fontSizeInput.value = state.fontSize;
-            applyStateToPrompter();
-            saveState();
-        });
-        DOM.fontSizeInput.addEventListener('input', (e) => {
-            let val = parseInt(e.target.value);
-            if(isNaN(val)) return;
-            if(val > 300) val = 300; if(val < 10) val = 10;
-            state.fontSize = val;
-            DOM.fontSizeSlider.value = state.fontSize;
-            applyStateToPrompter();
-            saveState();
-        });
-
-        // Margin Listeners
-        DOM.marginSlider.addEventListener('input', (e) => {
-            state.margin = parseInt(e.target.value);
-            DOM.marginInput.value = state.margin;
-            applyStateToPrompter();
-            saveState();
-        });
-        DOM.marginInput.addEventListener('input', (e) => {
-            let val = parseInt(e.target.value);
-            if(isNaN(val)) return;
-            if(val > 45) val = 45; if(val < 0) val = 0;
-            state.margin = val;
-            DOM.marginSlider.value = state.margin;
-            applyStateToPrompter();
-            saveState();
-        });
-
-        DOM.mirrorXToggle.addEventListener('change', (e) => {
-            state.mirrorX = e.target.checked;
-            applyStateToPrompter();
-            saveState();
-        });
-
-        DOM.mirrorYToggle.addEventListener('change', (e) => {
-            state.mirrorY = e.target.checked;
-            applyStateToPrompter();
-            saveState();
-        });
-
-        DOM.eyelineToggle.addEventListener('change', (e) => {
-            state.showEyeline = e.target.checked;
-            applyStateToPrompter();
-            saveState();
-        });
-
-        // Button Event Listeners
         DOM.playBtn.addEventListener('click', togglePlay);
         DOM.resetBtn.addEventListener('click', resetScroll);
         DOM.fullscreenBtn.addEventListener('click', toggleFullscreen);
         DOM.showSettingsBtn.addEventListener('click', showSettings);
 
-        // Keyboard Remote Control (Bluetooth Clickers)
+        // NEW: Mouse Wheel and Touchpad Scrolling
+        document.addEventListener('wheel', (e) => {
+            // Ignore if scrolling inside the settings menu or script input
+            if (DOM.settingsPanel.contains(e.target)) return;
+
+            currentScrollY += e.deltaY;
+            if (currentScrollY < 0) currentScrollY = 0; // Prevent scrolling past top
+            DOM.textContent.style.transform = `translateY(-${currentScrollY}px)`;
+        }, { passive: true });
+
+
+        // Keyboard Control
         document.addEventListener('keydown', (e) => {
-            // Ignore keystrokes if typing in any input or textarea
             if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
 
             switch (e.code) {
                 case 'Space':
                 case 'Enter':
-                    e.preventDefault(); // Prevent scrolling down by browser default
+                    e.preventDefault();
                     togglePlay();
+                    break;
+                case 'KeyW':
+                    // W Key to Scroll Up manually
+                    e.preventDefault();
+                    currentScrollY = Math.max(0, currentScrollY - 60);
+                    DOM.textContent.style.transform = `translateY(-${currentScrollY}px)`;
+                    break;
+                case 'KeyS':
+                    // S Key to Scroll Down manually
+                    e.preventDefault();
+                    currentScrollY += 60;
+                    DOM.textContent.style.transform = `translateY(-${currentScrollY}px)`;
                     break;
                 case 'ArrowUp':
                 case 'PageUp':
                     e.preventDefault();
-                    if (state.speed > 1) {
+                    if (e.shiftKey) {
+                        // Shift + ArrowUp to scroll up
+                        currentScrollY = Math.max(0, currentScrollY - 60);
+                        DOM.textContent.style.transform = `translateY(-${currentScrollY}px)`;
+                    } else if (state.speed > 1) {
+                        // Just ArrowUp to decrease speed (For Remotes)
                         state.speed--;
                         DOM.speedSlider.value = state.speed;
                         DOM.speedInput.value = state.speed;
@@ -479,7 +422,12 @@
                 case 'ArrowDown':
                 case 'PageDown':
                     e.preventDefault();
-                    if (state.speed < 50) {
+                    if (e.shiftKey) {
+                        // Shift + ArrowDown to scroll down
+                        currentScrollY += 60;
+                        DOM.textContent.style.transform = `translateY(-${currentScrollY}px)`;
+                    } else if (state.speed < 50) {
+                        // Just ArrowDown to increase speed (For Remotes)
                         state.speed++;
                         DOM.speedSlider.value = state.speed;
                         DOM.speedInput.value = state.speed;
@@ -487,7 +435,6 @@
                     }
                     break;
                 case 'Escape':
-                    // If settings are hidden, show them on escape
                     if (DOM.settingsPanel.classList.contains('settings-hidden')) {
                         showSettings();
                     }
@@ -495,7 +442,7 @@
             }
         });
 
-        // Mouse movement check to reveal cursor temporarily if hidden
+        // Reveal cursor temporarily if mouse moves
         let mouseTimer;
         document.addEventListener('mousemove', () => {
             if (isPlaying && document.body.classList.contains('cursor-hidden')) {
@@ -517,7 +464,6 @@
             peer = new Peer();
             
             if (isRemoteMode) {
-                // Initialize as Mobile Remote Controller (Hides prompter, shows big buttons)
                 document.getElementById('settings-panel').style.display = 'none';
                 document.getElementById('prompter-container').style.display = 'none';
                 document.getElementById('show-settings-btn').style.display = 'none';
@@ -541,7 +487,6 @@
                     });
                 });
 
-                // Attach touch/click events to mobile remote buttons
                 const btnActions = {
                     'remote-play-btn': 'togglePlay',
                     'remote-slower-btn': 'slower',
@@ -555,17 +500,15 @@
                     btn.addEventListener('mousedown', (e) => { if(peerConnection) peerConnection.send({cmd}); });
                 }
 
-                // NEW: Continuous Scroll Logic for Mobile Remote
                 let scrollInterval;
                 const startScroll = (cmd) => {
                     if(peerConnection) peerConnection.send({cmd});
                     scrollInterval = setInterval(() => {
                         if(peerConnection) peerConnection.send({cmd});
-                    }, 50); // Sends scroll command every 50ms for smooth manual scrolling
+                    }, 50); 
                 };
                 const stopScroll = () => clearInterval(scrollInterval);
 
-                // Attach hold events to scroll buttons
                 ['up', 'down'].forEach(dir => {
                     const btn = document.getElementById(`remote-scroll-${dir}-btn`);
                     const cmd = dir === 'up' ? 'scrollUp' : 'scrollDown';
@@ -578,7 +521,6 @@
                 });
 
             } else {
-                // Initialize as Host Prompter Screen (Generates QR Code)
                 peer.on('open', (id) => {
                     const remoteUrl = window.location.origin + window.location.pathname + '?remote=' + id;
                     document.getElementById('qrcode-container').classList.remove('hidden');
@@ -588,7 +530,6 @@
                     indicator.innerText = 'Ready';
                     indicator.classList.replace('text-yellow-500', 'text-blue-400');
                     
-                    // Generate QR
                     new QRCode(document.getElementById("qrcode-container"), {
                         text: remoteUrl,
                         width: 120,
@@ -611,7 +552,6 @@
                     indicator.innerText = 'Phone Connected';
                     indicator.classList.replace('text-blue-400', 'text-green-400');
                     
-                    // Listen for remote commands
                     conn.on('data', (data) => {
                         if(data.cmd === 'togglePlay') togglePlay();
                         if(data.cmd === 'slower') {
@@ -622,13 +562,12 @@
                         }
                         if(data.cmd === 'reset') resetScroll();
                         
-                        // NEW: Handle Manual Scroll Commands from Phone
                         if(data.cmd === 'scrollUp') {
-                            currentScrollY = Math.max(0, currentScrollY - 40); // Move 40px up
+                            currentScrollY = Math.max(0, currentScrollY - 40); 
                             DOM.textContent.style.transform = `translateY(-${currentScrollY}px)`;
                         }
                         if(data.cmd === 'scrollDown') {
-                            currentScrollY += 40; // Move 40px down
+                            currentScrollY += 40; 
                             DOM.textContent.style.transform = `translateY(-${currentScrollY}px)`;
                         }
                     });
@@ -641,13 +580,11 @@
             }
         }
 
-        // Initialize App
         if (!isRemoteMode) {
             loadState();
             animationFrameId = requestAnimationFrame(scrollLoop);
         }
         
-        // Wait for page to fully load before initializing networking
         window.addEventListener('load', () => {
             if (typeof Peer !== 'undefined') {
                 initWebRTC();
