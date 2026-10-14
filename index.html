@@ -2,44 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pro Teleprompter</title>
     
-    <!-- Import Tailwind CSS for styling -->
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" id="manifest-link">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Import Google Fonts -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    
-    <!-- Import FontAwesome for icons -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- WebRTC and QRCode for Mobile Remote Feature -->
+    <!-- WebRTC and QRCode -->
     <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #000;
-            color: #fff;
-            overflow: hidden; /* Prevent native scrolling */
-        }
-
-        /* Custom Scrollbar for Settings */
+        body { font-family: 'Inter', sans-serif; background-color: #000; color: #fff; overflow: hidden; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #1f2937; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
-
-        /* Mirroring Transforms */
         .mirror-x { transform: scaleX(-1); }
         .mirror-y { transform: scaleY(-1); }
         .mirror-xy { transform: scale(-1, -1); }
-
-        /* Hide cursor during playback */
         .cursor-hidden { cursor: none !important; }
-
-        /* Smooth settings panel transition */
         .settings-panel { transition: transform 0.3s ease-in-out; }
         .settings-hidden { transform: translateY(-100%); }
     </style>
@@ -47,7 +38,6 @@
 <body class="w-screen h-screen">
 
     <div id="settings-panel" class="settings-panel absolute top-0 left-0 w-full bg-gray-900 border-b border-gray-700 z-50 flex flex-col shadow-2xl custom-scrollbar overflow-y-auto p-6 max-h-[90vh]">
-        <!-- Top Panel Header -->
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold text-blue-400 flex items-center">
                 <i class="fa-solid fa-camera text-xl mr-2"></i> Prompter Pro
@@ -57,17 +47,13 @@
             </button>
         </div>
 
-        <!-- Settings Grid Layout -->
         <div class="flex-grow grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Script Input -->
             <div class="lg:col-span-1 flex flex-col">
                 <label class="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Your Script</label>
                 <textarea id="script-input" rows="12" class="w-full flex-grow bg-gray-800 border border-gray-600 rounded p-3 text-white focus:outline-none focus:border-blue-500 resize-y" placeholder="Paste your script here..."></textarea>
             </div>
 
-            <!-- Controls Group -->
             <div class="lg:col-span-1 flex flex-col justify-center space-y-8">
-                <!-- Speed Control -->
                 <div>
                     <label class="flex justify-between items-center text-sm font-bold text-gray-400 mb-3">
                         <span>Scroll Speed</span>
@@ -75,8 +61,6 @@
                     </label>
                     <input type="range" id="speed-slider" min="1" max="50" value="15" class="w-full accent-blue-500">
                 </div>
-
-                <!-- Font Size Control -->
                 <div>
                     <label class="flex justify-between items-center text-sm font-bold text-gray-400 mb-3">
                         <span>Font Size (px)</span>
@@ -84,8 +68,6 @@
                     </label>
                     <input type="range" id="font-size-slider" min="20" max="200" value="80" class="w-full accent-blue-500">
                 </div>
-
-                <!-- Margin Control -->
                 <div>
                     <label class="flex justify-between items-center text-sm font-bold text-gray-400 mb-3">
                         <span>Side Margins (%)</span>
@@ -95,7 +77,6 @@
                 </div>
             </div>
 
-            <!-- Display Settings & Actions -->
             <div class="lg:col-span-1 flex flex-col justify-between space-y-6">
                 <div class="space-y-4 bg-gray-800/40 p-5 rounded-lg border border-gray-700">
                     <label class="block text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">Display Settings</label>
@@ -116,7 +97,6 @@
                     </label>
                 </div>
 
-                <!-- Mobile Remote Section -->
                 <div class="space-y-3 bg-gray-800/40 p-4 rounded-lg border border-gray-700">
                     <label class="block text-sm font-bold text-gray-400 uppercase tracking-wider flex justify-between items-center">
                         Phone Remote
@@ -129,21 +109,17 @@
                     </button>
                 </div>
 
-                <!-- Bottom Actions -->
                 <div class="flex flex-col gap-3 mt-auto">
                     <button id="toggle-fullscreen-btn" class="w-full py-2 bg-gray-800 hover:bg-gray-700 rounded text-white font-semibold transition flex justify-center items-center border border-gray-600">
                         <i class="fa-solid fa-expand mr-2"></i> Enter Fullscreen
                     </button>
                     <div class="flex gap-2">
-                        <button id="reset-btn" class="w-1/3 py-3 bg-red-600 hover:bg-red-500 rounded text-white font-bold transition flex justify-center items-center">
+                        <button id="reset-btn" class="w-1/3 py-3 bg-red-600 hover:bg-red-500 rounded text-white font-bold transition flex justify-center items-center" title="Reset to Top">
                             <i class="fa-solid fa-rotate-left"></i>
                         </button>
                         <button id="play-btn" class="w-2/3 py-3 bg-blue-600 hover:bg-blue-500 rounded text-white font-bold transition flex justify-center items-center text-lg shadow-[0_0_15px_rgba(37,99,235,0.4)]">
                             <i class="fa-solid fa-play mr-2"></i> Play
                         </button>
-                    </div>
-                    <div class="text-xs text-gray-500 text-center">
-                        <b>Space</b>: Play/Pause &bull; <b>Up/Down</b>: Speed &bull; <b>Touchpad/W/S</b>: Scroll
                     </div>
                 </div>
             </div>
@@ -153,28 +129,48 @@
     <!-- Prompter View Container -->
     <div id="prompter-container" class="absolute top-0 left-0 w-full h-full flex justify-center z-10 pointer-events-none">
         
-        <!-- Eye-line Indicator / Highlighter (Behind Text: z-0) -->
-        <div id="eyeline-indicator" class="absolute top-1/4 left-0 w-full h-28 flex items-center justify-between z-0 pointer-events-none">
-            <!-- Left Edge Indicator -->
-            <div class="w-6 h-full bg-red-600 rounded-r shadow-[2px_0_15px_rgba(220,38,38,0.8)]"></div>
-            <!-- Center Transparent Highlight Area -->
-            <div class="w-full h-full bg-red-600/30 border-y-2 border-red-500/60 shadow-[0_0_20px_rgba(220,38,38,0.3)]"></div>
-            <!-- Right Edge Indicator -->
-            <div class="w-6 h-full bg-red-600 rounded-l shadow-[-2px_0_15px_rgba(220,38,38,0.8)]"></div>
+        <!-- Red Highlighter Background (Behind Text: z-0) -->
+        <div id="eyeline-indicator" class="absolute top-1/4 left-0 w-full h-28 flex items-center justify-between z-0 pointer-events-none bg-red-700/40 border-y-4 border-red-600/80 shadow-[0_0_30px_rgba(220,38,38,0.3)]">
+            <div class="w-6 h-full bg-red-600 rounded-r shadow-[2px_0_15px_rgba(220,38,38,1)]"></div>
+            <div class="w-6 h-full bg-red-600 rounded-l shadow-[-2px_0_15px_rgba(220,38,38,1)]"></div>
         </div>
 
-        <!-- Text Wrapper (Where mirroring is applied) -->
+        <!-- Text Wrapper -->
         <div id="text-wrapper" class="relative z-10 w-full h-full transform transition-transform duration-300">
-            <!-- Text Content -->
-            <div id="text-content" class="w-full text-white font-bold leading-relaxed whitespace-pre-wrap pt-[50vh] pb-[100vh] drop-shadow-lg" style="font-size: 80px; padding-left: 15%; padding-right: 15%;">
+            <!-- Drop-shadow added to text so it pops over the red highlighter -->
+            <div id="text-content" class="w-full text-white font-bold leading-relaxed whitespace-pre-wrap pt-[50vh] pb-[100vh] drop-shadow-[0_4px_10px_rgba(0,0,0,1)]" style="font-size: 80px; padding-left: 15%; padding-right: 15%;">
             </div>
         </div>
     </div>
 
-    <!-- Toggle Settings Button (Visible when settings are hidden) -->
     <button id="show-settings-btn" class="absolute top-4 left-4 z-40 bg-gray-800/50 hover:bg-gray-800 text-white w-12 h-12 rounded-full hidden flex items-center justify-center backdrop-blur transition pointer-events-auto shadow-lg">
         <i class="fa-solid fa-gear text-xl"></i>
     </button>
+
+    <!-- Mini Controls Menu (Fullscreen Shortcuts) -->
+    <div id="mini-controls" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-gray-900/90 backdrop-blur border border-gray-700 rounded-full px-6 py-3 flex gap-3 items-center shadow-2xl transition-all duration-300 opacity-0 pointer-events-none translate-y-4">
+        
+        <!-- Manual Scroll Up/Down Buttons -->
+        <button onclick="manualScroll('up')" class="w-10 h-10 flex items-center justify-center text-white bg-gray-800 hover:bg-gray-700 rounded-full text-xl transition" title="Scroll Up"><i class="fa-solid fa-angles-up"></i></button>
+        <button onclick="manualScroll('down')" class="w-10 h-10 flex items-center justify-center text-white bg-gray-800 hover:bg-gray-700 rounded-full text-xl transition" title="Scroll Down"><i class="fa-solid fa-angles-down"></i></button>
+        
+        <div class="w-px h-8 bg-gray-600 mx-1"></div>
+
+        <!-- Speed Controls -->
+        <button onclick="changeSpeed(-1)" class="w-10 h-10 flex items-center justify-center text-white bg-gray-800 hover:bg-gray-700 rounded-full text-xl transition" title="Slower"><i class="fa-solid fa-minus"></i></button>
+        <div class="text-xs text-gray-400 font-bold mx-1">SPEED</div>
+        <button onclick="changeSpeed(1)" class="w-10 h-10 flex items-center justify-center text-white bg-gray-800 hover:bg-gray-700 rounded-full text-xl transition" title="Faster"><i class="fa-solid fa-plus"></i></button>
+        
+        <div class="w-px h-8 bg-gray-600 mx-1"></div>
+        
+        <!-- Play/Pause -->
+        <button onclick="togglePlay()" class="w-14 h-14 flex items-center justify-center text-white bg-blue-600 hover:bg-blue-500 rounded-full text-2xl transition shadow-[0_0_15px_rgba(37,99,235,0.4)]" title="Play / Pause"><i id="mini-play-icon" class="fa-solid fa-pause"></i></button>
+        
+        <div class="w-px h-8 bg-gray-600 mx-1"></div>
+        
+        <!-- Settings -->
+        <button onclick="showSettings()" class="w-10 h-10 flex items-center justify-center text-white bg-gray-800 hover:bg-gray-700 rounded-full text-xl transition" title="Settings"><i class="fa-solid fa-gear"></i></button>
+    </div>
 
     <!-- Mobile Remote Interface -->
     <div id="mobile-remote-view" class="fixed inset-0 bg-gray-900 z-[100] hidden flex-col items-center justify-start pt-12 px-6 space-y-6 overflow-y-auto w-full h-full">
@@ -188,7 +184,7 @@
         
         <button id="remote-play-btn" class="w-full max-w-md bg-blue-600 active:bg-blue-500 rounded-3xl py-12 text-white font-bold text-3xl shadow-[0_0_20px_rgba(37,99,235,0.4)] flex flex-col items-center transition"><i class="fa-solid fa-play mb-3 text-5xl"></i> Play / Pause</button>
         
-        <!-- Manual Scroll Buttons -->
+        <!-- Mobile Manual Scroll Buttons -->
         <div class="flex gap-4 w-full max-w-md mt-4">
             <button id="remote-scroll-up-btn" class="flex-1 bg-gray-700 active:bg-gray-600 rounded-2xl py-6 text-white font-bold text-xl shadow-lg flex flex-col items-center transition select-none"><i class="fa-solid fa-angles-up mb-2 text-3xl text-gray-400"></i> Scroll Up</button>
             <button id="remote-scroll-down-btn" class="flex-1 bg-gray-700 active:bg-gray-600 rounded-2xl py-6 text-white font-bold text-xl shadow-lg flex flex-col items-center transition select-none"><i class="fa-solid fa-angles-down mb-2 text-3xl text-gray-400"></i> Scroll Down</button>
@@ -198,15 +194,9 @@
     </div>
 
     <script>
-        // State Variables
         let state = {
-            script: "Welcome to Prompter Pro!\n\nWrite or paste your script here.\n\nUse the settings on the left to adjust:\n- Scroll Speed\n- Font Size\n- Margins\n\nYou can mirror the text horizontally or vertically to match your Neewer teleprompter glass setup.\n\nPRO TIP: You can use a Bluetooth clicker to control this app.\n- Spacebar: Play & Pause\n- Up/Down Arrows: Adjust speed on the fly.\n- W/S Keys or Mouse Scroll: Manually scroll the text.\n\nWhen you press Play, the settings panel will auto-hide to prevent light bleed.",
-            speed: 15,
-            fontSize: 80,
-            margin: 15,
-            mirrorX: false,
-            mirrorY: false,
-            showEyeline: true
+            script: "Welcome to Prompter Pro!\n\nWrite or paste your script here.\n\nPRO TIP: Use your PPT Clicker Remote to control this app!\n- Play/F5 Button: Play & Pause\n- Up/Down Arrows: Scroll text manually\n- Left/Right Arrows: Change speed\n- Blank Screen Button: Reset to top\n\nYou can also use your Mouse Wheel or Touchpad to scroll smoothly.",
+            speed: 15, fontSize: 80, margin: 15, mirrorX: false, mirrorY: false, showEyeline: true
         };
 
         let isPlaying = false;
@@ -214,10 +204,11 @@
         let animationFrameId = null;
         let lastTimestamp = null;
 
-        // DOM Elements
         const DOM = {
             settingsPanel: document.getElementById('settings-panel'),
             showSettingsBtn: document.getElementById('show-settings-btn'),
+            miniControls: document.getElementById('mini-controls'),
+            miniPlayIcon: document.getElementById('mini-play-icon'),
             scriptInput: document.getElementById('script-input'),
             speedSlider: document.getElementById('speed-slider'),
             speedInput: document.getElementById('speed-input'),
@@ -236,95 +227,90 @@
             eyelineIndicator: document.getElementById('eyeline-indicator'),
         };
 
-        // Load state from local storage
         function loadState() {
-            const savedState = localStorage.getItem('prompterState');
-            if (savedState) {
-                try {
-                    state = { ...state, ...JSON.parse(savedState) };
-                } catch (e) { console.error("Error parsing saved state"); }
-            }
-            updateUIFromState();
-            applyStateToPrompter();
+            const saved = localStorage.getItem('prompterState');
+            if (saved) { try { state = { ...state, ...JSON.parse(saved) }; } catch(e){} }
+            updateUIFromState(); applyStateToPrompter();
         }
 
-        // Save state to local storage
-        function saveState() {
-            localStorage.setItem('prompterState', JSON.stringify(state));
-        }
+        function saveState() { localStorage.setItem('prompterState', JSON.stringify(state)); }
 
-        // Update UI
         function updateUIFromState() {
-            DOM.scriptInput.value = state.script;
-            DOM.speedSlider.value = state.speed;
-            DOM.speedInput.value = state.speed;
-            DOM.fontSizeSlider.value = state.fontSize;
-            DOM.fontSizeInput.value = state.fontSize;
-            DOM.marginSlider.value = state.margin;
-            DOM.marginInput.value = state.margin;
-            DOM.mirrorXToggle.checked = state.mirrorX;
-            DOM.mirrorYToggle.checked = state.mirrorY;
-            DOM.eyelineToggle.checked = state.showEyeline;
+            DOM.scriptInput.value = state.script; DOM.speedSlider.value = state.speed; DOM.speedInput.value = state.speed;
+            DOM.fontSizeSlider.value = state.fontSize; DOM.fontSizeInput.value = state.fontSize;
+            DOM.marginSlider.value = state.margin; DOM.marginInput.value = state.margin;
+            DOM.mirrorXToggle.checked = state.mirrorX; DOM.mirrorYToggle.checked = state.mirrorY; DOM.eyelineToggle.checked = state.showEyeline;
         }
 
-        // Apply state
         function applyStateToPrompter() {
             DOM.textContent.innerText = state.script || " ";
             DOM.textContent.style.fontSize = `${state.fontSize}px`;
-            DOM.textContent.style.paddingLeft = `${state.margin}%`;
-            DOM.textContent.style.paddingRight = `${state.margin}%`;
+            DOM.textContent.style.paddingLeft = `${state.margin}%`; DOM.textContent.style.paddingRight = `${state.margin}%`;
             
             DOM.textWrapper.className = 'relative z-10 w-full h-full transform transition-transform duration-300';
-            if (state.mirrorX && state.mirrorY) {
-                DOM.textWrapper.classList.add('mirror-xy');
-            } else if (state.mirrorX) {
-                DOM.textWrapper.classList.add('mirror-x');
-            } else if (state.mirrorY) {
-                DOM.textWrapper.classList.add('mirror-y');
-            }
+            if (state.mirrorX && state.mirrorY) DOM.textWrapper.classList.add('mirror-xy');
+            else if (state.mirrorX) DOM.textWrapper.classList.add('mirror-x');
+            else if (state.mirrorY) DOM.textWrapper.classList.add('mirror-y');
 
             DOM.eyelineIndicator.style.display = state.showEyeline ? 'flex' : 'none';
         }
 
-        // Scroll Engine
         function scrollLoop(timestamp) {
             if (!lastTimestamp) lastTimestamp = timestamp;
             const deltaTime = timestamp - lastTimestamp;
             lastTimestamp = timestamp;
 
             if (isPlaying) {
-                const speedMultiplier = state.speed * 0.01; 
-                currentScrollY += speedMultiplier * deltaTime;
+                currentScrollY += (state.speed * 0.01) * deltaTime;
                 DOM.textContent.style.transform = `translateY(-${currentScrollY}px)`;
             }
-
             animationFrameId = requestAnimationFrame(scrollLoop);
         }
 
-        // Play/Pause Controller
         function togglePlay() {
             isPlaying = !isPlaying;
-            
             if (isPlaying) {
                 DOM.playBtn.innerHTML = '<i class="fa-solid fa-pause mr-2"></i> Pause';
                 DOM.playBtn.classList.replace('bg-blue-600', 'bg-amber-600');
                 DOM.playBtn.classList.replace('hover:bg-blue-500', 'hover:bg-amber-500');
+                DOM.miniPlayIcon.classList.replace('fa-play', 'fa-pause');
                 hideSettings();
                 document.body.classList.add('cursor-hidden');
+                
+                if (window.innerWidth < 1024) { 
+                    try {
+                        document.documentElement.requestFullscreen().then(() => {
+                            if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{});
+                        }).catch(()=>{});
+                    } catch(err) {}
+                }
                 lastTimestamp = performance.now();
+                wakeUpControls();
             } else {
                 DOM.playBtn.innerHTML = '<i class="fa-solid fa-play mr-2"></i> Play';
                 DOM.playBtn.classList.replace('bg-amber-600', 'bg-blue-600');
                 DOM.playBtn.classList.replace('hover:bg-amber-500', 'hover:bg-blue-500');
+                DOM.miniPlayIcon.classList.replace('fa-pause', 'fa-play');
                 document.body.classList.remove('cursor-hidden');
+                DOM.miniControls.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                
+                if (document.fullscreenElement) {
+                    if (document.exitFullscreen) document.exitFullscreen();
+                    if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+                }
             }
         }
 
-        // Reset Scroll
         function resetScroll() {
-            currentScrollY = 0;
-            DOM.textContent.style.transform = `translateY(0px)`;
+            currentScrollY = 0; DOM.textContent.style.transform = `translateY(0px)`;
             if (isPlaying) togglePlay();
+        }
+
+        function manualScroll(direction) {
+            if (direction === 'up') currentScrollY = Math.max(0, currentScrollY - 60);
+            else currentScrollY += 60;
+            DOM.textContent.style.transform = `translateY(-${currentScrollY}px)`;
+            wakeUpControls();
         }
 
         function hideSettings() {
@@ -335,33 +321,42 @@
         function showSettings() {
             DOM.settingsPanel.classList.remove('settings-hidden');
             DOM.showSettingsBtn.classList.add('hidden');
+            DOM.miniControls.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
             if (isPlaying) togglePlay(); 
         }
 
+        function changeSpeed(delta) {
+            let newVal = state.speed + delta;
+            if(newVal > 50) newVal = 50; if(newVal < 1) newVal = 1;
+            state.speed = newVal; DOM.speedSlider.value = state.speed; DOM.speedInput.value = state.speed;
+            saveState(); wakeUpControls();
+        }
+
         function toggleFullscreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {});
-            } else {
-                if (document.exitFullscreen) document.exitFullscreen();
-            }
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+            else if (document.exitFullscreen) document.exitFullscreen();
         }
 
         document.addEventListener('fullscreenchange', () => {
-            if (document.fullscreenElement) {
-                DOM.fullscreenBtn.innerHTML = '<i class="fa-solid fa-compress mr-2"></i> Exit Fullscreen';
-            } else {
-                DOM.fullscreenBtn.innerHTML = '<i class="fa-solid fa-expand mr-2"></i> Enter Fullscreen';
-            }
+            if (document.fullscreenElement) DOM.fullscreenBtn.innerHTML = '<i class="fa-solid fa-compress mr-2"></i> Exit Fullscreen';
+            else DOM.fullscreenBtn.innerHTML = '<i class="fa-solid fa-expand mr-2"></i> Enter Fullscreen';
         });
 
-        // UI Listeners
+        // Event Listeners for UI
         DOM.scriptInput.addEventListener('input', (e) => { state.script = e.target.value; applyStateToPrompter(); saveState(); });
-        DOM.speedSlider.addEventListener('input', (e) => { state.speed = parseInt(e.target.value); DOM.speedInput.value = state.speed; saveState(); });
-        DOM.speedInput.addEventListener('input', (e) => { let val = parseInt(e.target.value); if(isNaN(val)) return; if(val>50)val=50; if(val<1)val=1; state.speed = val; DOM.speedSlider.value = state.speed; saveState(); });
-        DOM.fontSizeSlider.addEventListener('input', (e) => { state.fontSize = parseInt(e.target.value); DOM.fontSizeInput.value = state.fontSize; applyStateToPrompter(); saveState(); });
-        DOM.fontSizeInput.addEventListener('input', (e) => { let val = parseInt(e.target.value); if(isNaN(val)) return; if(val>300)val=300; if(val<10)val=10; state.fontSize = val; DOM.fontSizeSlider.value = state.fontSize; applyStateToPrompter(); saveState(); });
-        DOM.marginSlider.addEventListener('input', (e) => { state.margin = parseInt(e.target.value); DOM.marginInput.value = state.margin; applyStateToPrompter(); saveState(); });
-        DOM.marginInput.addEventListener('input', (e) => { let val = parseInt(e.target.value); if(isNaN(val)) return; if(val>45)val=45; if(val<0)val=0; state.margin = val; DOM.marginSlider.value = state.margin; applyStateToPrompter(); saveState(); });
+        
+        const syncSpeed = (val) => { let v=parseInt(val); if(isNaN(v))return; if(v>50)v=50; if(v<1)v=1; state.speed=v; DOM.speedSlider.value=v; DOM.speedInput.value=v; saveState();};
+        DOM.speedSlider.addEventListener('input', (e) => syncSpeed(e.target.value));
+        DOM.speedInput.addEventListener('input', (e) => syncSpeed(e.target.value));
+        
+        const syncFontSize = (val) => { let v=parseInt(val); if(isNaN(v))return; if(v>300)v=300; if(v<10)v=10; state.fontSize=v; DOM.fontSizeSlider.value=v; DOM.fontSizeInput.value=v; applyStateToPrompter(); saveState();};
+        DOM.fontSizeSlider.addEventListener('input', (e) => syncFontSize(e.target.value));
+        DOM.fontSizeInput.addEventListener('input', (e) => syncFontSize(e.target.value));
+        
+        const syncMargin = (val) => { let v=parseInt(val); if(isNaN(v))return; if(v>45)v=45; if(v<0)v=0; state.margin=v; DOM.marginSlider.value=v; DOM.marginInput.value=v; applyStateToPrompter(); saveState();};
+        DOM.marginSlider.addEventListener('input', (e) => syncMargin(e.target.value));
+        DOM.marginInput.addEventListener('input', (e) => syncMargin(e.target.value));
+
         DOM.mirrorXToggle.addEventListener('change', (e) => { state.mirrorX = e.target.checked; applyStateToPrompter(); saveState(); });
         DOM.mirrorYToggle.addEventListener('change', (e) => { state.mirrorY = e.target.checked; applyStateToPrompter(); saveState(); });
         DOM.eyelineToggle.addEventListener('change', (e) => { state.showEyeline = e.target.checked; applyStateToPrompter(); saveState(); });
@@ -371,155 +366,119 @@
         DOM.fullscreenBtn.addEventListener('click', toggleFullscreen);
         DOM.showSettingsBtn.addEventListener('click', showSettings);
 
-        // NEW: Mouse Wheel and Touchpad Scrolling
+        // Mouse Wheel Scrolling
         document.addEventListener('wheel', (e) => {
-            // Ignore if scrolling inside the settings menu or script input
             if (DOM.settingsPanel.contains(e.target)) return;
-
             currentScrollY += e.deltaY;
-            if (currentScrollY < 0) currentScrollY = 0; // Prevent scrolling past top
+            if (currentScrollY < 0) currentScrollY = 0; 
             DOM.textContent.style.transform = `translateY(-${currentScrollY}px)`;
         }, { passive: true });
 
+        // Touch Drag (Swipe) to Scroll
+        let touchDragY = 0; let isDraggingTouch = false;
+        document.addEventListener('touchstart', (e) => {
+            if (DOM.settingsPanel.contains(e.target) || DOM.miniControls.contains(e.target) || document.getElementById('mobile-remote-view').contains(e.target)) return;
+            isDraggingTouch = true; touchDragY = e.touches[0].clientY;
+        }, { passive: true });
+        document.addEventListener('touchmove', (e) => {
+            if (!isDraggingTouch) return;
+            let diff = touchDragY - e.touches[0].clientY;
+            currentScrollY += diff;
+            if (currentScrollY < 0) currentScrollY = 0;
+            DOM.textContent.style.transform = `translateY(-${currentScrollY}px)`;
+            touchDragY = e.touches[0].clientY; 
+        }, { passive: true });
+        document.addEventListener('touchend', () => { isDraggingTouch = false; });
 
-        // Keyboard Control
+        // Keyboard & Presenter Remote Controls
         document.addEventListener('keydown', (e) => {
             if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
-
             switch (e.code) {
-                case 'Space':
-                case 'Enter':
-                    e.preventDefault();
-                    togglePlay();
-                    break;
-                case 'KeyW':
-                    // W Key to Scroll Up manually
-                    e.preventDefault();
-                    currentScrollY = Math.max(0, currentScrollY - 60);
-                    DOM.textContent.style.transform = `translateY(-${currentScrollY}px)`;
-                    break;
-                case 'KeyS':
-                    // S Key to Scroll Down manually
-                    e.preventDefault();
-                    currentScrollY += 60;
-                    DOM.textContent.style.transform = `translateY(-${currentScrollY}px)`;
-                    break;
-                case 'ArrowUp':
-                case 'PageUp':
-                    e.preventDefault();
-                    if (e.shiftKey) {
-                        // Shift + ArrowUp to scroll up
-                        currentScrollY = Math.max(0, currentScrollY - 60);
-                        DOM.textContent.style.transform = `translateY(-${currentScrollY}px)`;
-                    } else if (state.speed > 1) {
-                        // Just ArrowUp to decrease speed (For Remotes)
-                        state.speed--;
-                        DOM.speedSlider.value = state.speed;
-                        DOM.speedInput.value = state.speed;
-                        saveState();
-                    }
-                    break;
-                case 'ArrowDown':
-                case 'PageDown':
-                    e.preventDefault();
-                    if (e.shiftKey) {
-                        // Shift + ArrowDown to scroll down
-                        currentScrollY += 60;
-                        DOM.textContent.style.transform = `translateY(-${currentScrollY}px)`;
-                    } else if (state.speed < 50) {
-                        // Just ArrowDown to increase speed (For Remotes)
-                        state.speed++;
-                        DOM.speedSlider.value = state.speed;
-                        DOM.speedInput.value = state.speed;
-                        saveState();
-                    }
-                    break;
+                case 'Space': case 'Enter': case 'F5': // Play/Pause (Space, Enter, Presenter Play)
+                    e.preventDefault(); togglePlay(); break;
+                case 'KeyB': case 'Period': // Reset to Top (Presenter Blank Screen)
+                    e.preventDefault(); resetScroll(); break;
+                case 'ArrowUp': case 'PageUp': case 'KeyW': // Scroll Up manually (Presenter < / Arrow Up)
+                    e.preventDefault(); manualScroll('up'); break;
+                case 'ArrowDown': case 'PageDown': case 'KeyS': // Scroll Down manually (Presenter > / Arrow Down)
+                    e.preventDefault(); manualScroll('down'); break;
+                case 'ArrowLeft': case 'KeyA': // Decrease speed
+                    e.preventDefault(); changeSpeed(-1); break;
+                case 'ArrowRight': case 'KeyD': // Increase speed
+                    e.preventDefault(); changeSpeed(1); break;
                 case 'Escape':
-                    if (DOM.settingsPanel.classList.contains('settings-hidden')) {
-                        showSettings();
-                    }
-                    break;
+                    if (DOM.settingsPanel.classList.contains('settings-hidden')) showSettings(); break;
             }
         });
 
-        // Reveal cursor temporarily if mouse moves
-        let mouseTimer;
-        document.addEventListener('mousemove', () => {
-            if (isPlaying && document.body.classList.contains('cursor-hidden')) {
+        // Hide UI on inactivity
+        let mouseTimer; let miniControlsTimer;
+        function wakeUpControls() {
+            if (isPlaying) {
                 document.body.classList.remove('cursor-hidden');
-                clearTimeout(mouseTimer);
-                mouseTimer = setTimeout(() => {
-                    if (isPlaying) document.body.classList.add('cursor-hidden');
-                }, 2000);
+                DOM.miniControls.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                clearTimeout(mouseTimer); clearTimeout(miniControlsTimer);
+                
+                mouseTimer = setTimeout(() => { if (isPlaying) document.body.classList.add('cursor-hidden'); }, 2000);
+                miniControlsTimer = setTimeout(() => { if (isPlaying) DOM.miniControls.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4'); }, 3500);
             }
-        });
+        }
+        document.addEventListener('mousemove', wakeUpControls);
+        document.addEventListener('touchstart', wakeUpControls, { passive: true });
 
-        let peer = null;
-        let peerConnection = null;
+        // WebRTC Phone Remote
+        let peer = null; let peerConnection = null;
         const urlParams = new URLSearchParams(window.location.search);
         const isRemoteMode = urlParams.has('remote');
         const hostId = urlParams.get('remote');
 
         function initWebRTC() {
             peer = new Peer();
-            
             if (isRemoteMode) {
                 document.getElementById('settings-panel').style.display = 'none';
                 document.getElementById('prompter-container').style.display = 'none';
                 document.getElementById('show-settings-btn').style.display = 'none';
+                document.getElementById('mini-controls').style.display = 'none';
                 
                 const remoteView = document.getElementById('mobile-remote-view');
-                remoteView.classList.remove('hidden');
-                remoteView.classList.add('flex');
+                remoteView.classList.remove('hidden'); remoteView.classList.add('flex');
                 
                 peer.on('open', () => {
                     peerConnection = peer.connect(hostId);
                     const statusText = document.getElementById('remote-connection-status');
-                    
                     peerConnection.on('open', () => {
                         statusText.innerHTML = '<i class="fa-solid fa-link"></i> Connected to Prompter';
                         statusText.classList.replace('text-yellow-400', 'text-green-400');
                     });
-                    
                     peerConnection.on('close', () => {
                         statusText.innerHTML = '<i class="fa-solid fa-link-slash"></i> Disconnected';
                         statusText.classList.replace('text-green-400', 'text-red-500');
                     });
                 });
 
-                const btnActions = {
-                    'remote-play-btn': 'togglePlay',
-                    'remote-slower-btn': 'slower',
-                    'remote-faster-btn': 'faster',
-                    'remote-reset-btn': 'reset'
-                };
-
+                const btnActions = { 'remote-play-btn': 'togglePlay', 'remote-slower-btn': 'slower', 'remote-faster-btn': 'faster', 'remote-reset-btn': 'reset' };
                 for (const [id, cmd] of Object.entries(btnActions)) {
                     const btn = document.getElementById(id);
                     btn.addEventListener('touchstart', (e) => { e.preventDefault(); if(peerConnection) peerConnection.send({cmd}); });
-                    btn.addEventListener('mousedown', (e) => { if(peerConnection) peerConnection.send({cmd}); });
+                    btn.addEventListener('mousedown', () => { if(peerConnection) peerConnection.send({cmd}); });
                 }
 
                 let scrollInterval;
                 const startScroll = (cmd) => {
                     if(peerConnection) peerConnection.send({cmd});
-                    scrollInterval = setInterval(() => {
-                        if(peerConnection) peerConnection.send({cmd});
-                    }, 50); 
+                    scrollInterval = setInterval(() => { if(peerConnection) peerConnection.send({cmd}); }, 50); 
                 };
                 const stopScroll = () => clearInterval(scrollInterval);
 
                 ['up', 'down'].forEach(dir => {
                     const btn = document.getElementById(`remote-scroll-${dir}-btn`);
                     const cmd = dir === 'up' ? 'scrollUp' : 'scrollDown';
-                    
                     btn.addEventListener('touchstart', (e) => { e.preventDefault(); startScroll(cmd); });
                     btn.addEventListener('touchend', (e) => { e.preventDefault(); stopScroll(); });
                     btn.addEventListener('mousedown', (e) => { e.preventDefault(); startScroll(cmd); });
                     btn.addEventListener('mouseup', stopScroll);
                     btn.addEventListener('mouseleave', stopScroll);
                 });
-
             } else {
                 peer.on('open', (id) => {
                     const remoteUrl = window.location.origin + window.location.pathname + '?remote=' + id;
@@ -527,18 +486,9 @@
                     document.getElementById('copy-link-btn').classList.remove('hidden');
                     
                     const indicator = document.getElementById('remote-status-indicator');
-                    indicator.innerText = 'Ready';
-                    indicator.classList.replace('text-yellow-500', 'text-blue-400');
+                    indicator.innerText = 'Ready'; indicator.classList.replace('text-yellow-500', 'text-blue-400');
                     
-                    new QRCode(document.getElementById("qrcode-container"), {
-                        text: remoteUrl,
-                        width: 120,
-                        height: 120,
-                        colorDark : "#000000",
-                        colorLight : "#ffffff",
-                        correctLevel : QRCode.CorrectLevel.L
-                    });
-
+                    new QRCode(document.getElementById("qrcode-container"), { text: remoteUrl, width: 120, height: 120, colorDark : "#000000", colorLight : "#ffffff" });
                     document.getElementById('copy-link-btn').onclick = () => {
                         navigator.clipboard.writeText(remoteUrl);
                         const btn = document.getElementById('copy-link-btn');
@@ -546,51 +496,38 @@
                         setTimeout(() => btn.innerHTML = '<i class="fa-solid fa-link mr-2"></i> Copy Remote Link', 2000);
                     };
                 });
-
                 peer.on('connection', (conn) => {
                     const indicator = document.getElementById('remote-status-indicator');
-                    indicator.innerText = 'Phone Connected';
-                    indicator.classList.replace('text-blue-400', 'text-green-400');
+                    indicator.innerText = 'Phone Connected'; indicator.classList.replace('text-blue-400', 'text-green-400');
                     
                     conn.on('data', (data) => {
                         if(data.cmd === 'togglePlay') togglePlay();
-                        if(data.cmd === 'slower') {
-                            if (state.speed > 1) { state.speed--; DOM.speedSlider.value = state.speed; DOM.speedInput.value = state.speed; saveState(); }
-                        }
-                        if(data.cmd === 'faster') {
-                            if (state.speed < 50) { state.speed++; DOM.speedSlider.value = state.speed; DOM.speedInput.value = state.speed; saveState(); }
-                        }
+                        if(data.cmd === 'slower') changeSpeed(-1);
+                        if(data.cmd === 'faster') changeSpeed(1);
                         if(data.cmd === 'reset') resetScroll();
-                        
-                        if(data.cmd === 'scrollUp') {
-                            currentScrollY = Math.max(0, currentScrollY - 40); 
-                            DOM.textContent.style.transform = `translateY(-${currentScrollY}px)`;
-                        }
-                        if(data.cmd === 'scrollDown') {
-                            currentScrollY += 40; 
-                            DOM.textContent.style.transform = `translateY(-${currentScrollY}px)`;
-                        }
+                        if(data.cmd === 'scrollUp') manualScroll('up');
+                        if(data.cmd === 'scrollDown') manualScroll('down');
                     });
-
                     conn.on('close', () => {
-                        indicator.innerText = 'Offline';
-                        indicator.classList.replace('text-green-400', 'text-red-500');
+                        indicator.innerText = 'Offline'; indicator.classList.replace('text-green-400', 'text-red-500');
                     });
                 });
             }
         }
 
         if (!isRemoteMode) {
-            loadState();
-            animationFrameId = requestAnimationFrame(scrollLoop);
+            loadState(); animationFrameId = requestAnimationFrame(scrollLoop);
         }
         
         window.addEventListener('load', () => {
-            if (typeof Peer !== 'undefined') {
-                initWebRTC();
-            }
+            if (typeof Peer !== 'undefined') initWebRTC();
+            const manifest = {
+                name: "Pro Teleprompter", short_name: "Prompter", display: "standalone", background_color: "#000000", theme_color: "#000000", orientation: "any",
+                icons: [{ src: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik0xMjggMTI4aDI1NnYyNTZIMTI4eiIgZmlsbD0iIzI1NjNFQiIvPjwvc3ZnPg==", sizes: "512x512", type: "image/svg+xml" }]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/manifest+json'});
+            document.getElementById('manifest-link').href = URL.createObjectURL(manifestBlob);
         });
-
     </script>
 </body>
 </html>
